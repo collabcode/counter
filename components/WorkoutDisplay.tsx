@@ -117,24 +117,24 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
   };
 
   const cellClasses = {
-    completed: 'bg-green-500/90 shadow-inner shadow-green-900/10 scale-100',
-    active: 'bg-yellow-500/90 shadow-lg shadow-yellow-500/30 scale-110 animate-pulse',
-    upcoming: 'bg-gray-300/80 dark:bg-gray-700/80 scale-100',
+    completed: 'bg-gradient-to-br from-emerald-500 to-green-500 shadow-lg shadow-emerald-500/20 scale-100',
+    active: 'bg-gradient-to-br from-amber-400 to-yellow-500 shadow-2xl shadow-amber-500/40 scale-105 ring-2 ring-amber-300/50 dark:ring-amber-400/30 animate-pulse',
+    upcoming: 'bg-gray-200/60 dark:bg-gray-700/60 scale-100 border border-gray-300/30 dark:border-gray-600/30',
   };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4 relative">
       {/* Grid */}
       <div 
-        className="grid gap-2 md:gap-4 transition-opacity duration-500"
+        className="grid gap-2 md:gap-3 lg:gap-4 transition-opacity duration-500"
         style={{
           gridTemplateColumns: `repeat(${steps}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${sets}, minmax(0, 1fr))`,
           aspectRatio: `${steps}/${sets}`,
           width: '100%',
-          maxWidth: '80vh',
-          maxHeight: '80vh',
-          opacity: isFinished ? 0.3 : 1
+          maxWidth: '85vh',
+          maxHeight: '85vh',
+          opacity: isFinished ? 0.25 : 1
         }}
       >
         {Array.from({ length: sets }).map((_, setIndex) =>
@@ -143,7 +143,7 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
             return (
               <div
                 key={`${setIndex}-${stepIndex}`}
-                className={`rounded-lg transition-all duration-500 ease-in-out ${cellClasses[state]}`}
+                className={`rounded-xl md:rounded-2xl transition-all duration-500 ease-in-out ${cellClasses[state]}`}
               />
             );
           })
@@ -152,31 +152,34 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
 
       {/* Central Overlay */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-center bg-gray-50/70 dark:bg-gray-900/70 backdrop-blur-sm p-8 rounded-2xl" role="status" aria-live="polite">
+        <div className="text-center bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl p-6 md:p-10 lg:p-12 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-[90%] md:max-w-md" role="status" aria-live="polite">
           {isFinished ? (
             <>
-              <h2 className="text-6xl md:text-8xl font-black text-green-500 dark:text-green-400">COMPLETE!</h2>
-              <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-2">{config.name || 'Great work!'}</p>
-              <button onClick={() => onGoHome(true)} className="mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg text-lg flex items-center justify-center gap-2 pointer-events-auto transition-transform transform hover:scale-105">
-                <RestartIcon />
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-green-500 dark:from-emerald-400 dark:to-green-400 mb-2">COMPLETE!</h2>
+              <p className="text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mt-2">{config.name || 'Great work!'}</p>
+              <button 
+                onClick={() => onGoHome(true)} 
+                className="mt-6 md:mt-8 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl text-base md:text-lg flex items-center justify-center gap-2 pointer-events-auto transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 active:scale-95 mx-auto"
+              >
+                <RestartIcon className="w-5 h-5 md:w-6 md:h-6" />
                 New Session
               </button>
             </>
           ) : isResting ? (
             <>
-              <p className="text-3xl md:text-5xl font-bold text-gray-700 dark:text-gray-300">REST</p>
-              <p className="text-7xl md:text-9xl font-black text-cyan-500 dark:text-cyan-400">{restTime}</p>
-              <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 mt-2">Next: Set {currentSet + 1}</p>
+              <p className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-700 dark:text-gray-300 tracking-wide">REST</p>
+              <p className="text-6xl md:text-8xl lg:text-9xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-blue-400 my-2">{restTime}</p>
+              <p className="text-lg md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 mt-2">Next: Set {currentSet + 1}</p>
             </>
           ) : isPaused ? (
-             <h2 className="text-6xl md:text-8xl font-black text-gray-500 dark:text-gray-400">PAUSED</h2>
+             <h2 className="text-5xl md:text-7xl lg:text-8xl font-black text-gray-500 dark:text-gray-400 tracking-wide">PAUSED</h2>
           ) : (
             <>
-              <p className="text-2xl md:text-4xl font-bold text-gray-700 dark:text-gray-300">Set {currentSet}/{sets} &bull; Step {currentStep}/{steps}</p>
-              <p className="text-7xl md:text-9xl font-black text-yellow-500 dark:text-yellow-400 my-2">
+              <p className="text-xl md:text-3xl lg:text-4xl font-bold text-gray-700 dark:text-gray-300 mb-2">Set {currentSet}/{sets} &bull; Step {currentStep}/{steps}</p>
+              <p className="text-6xl md:text-8xl lg:text-9xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-yellow-500 dark:from-amber-400 dark:to-yellow-400 my-2">
                 {counterType === CounterType.DOWN ? time : time + 1}
               </p>
-              <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400">seconds</p>
+              <p className="text-lg md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400">seconds</p>
             </>
           )}
         </div>

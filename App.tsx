@@ -59,7 +59,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center p-4 pt-24 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-gray-100 flex flex-col items-center p-4 pt-20 md:pt-24 transition-all duration-500">
       <Header
         sessionActive={!!sessionConfig}
         isPaused={isPaused}
@@ -70,7 +70,7 @@ function App() {
         onThemeToggle={toggleTheme}
       />
       
-      <main className="w-full max-w-7xl flex-grow flex items-center justify-center">
+      <main className="w-full max-w-7xl flex-grow flex items-center justify-center py-8">
         {sessionConfig ? (
           <WorkoutDisplay 
             config={sessionConfig} 

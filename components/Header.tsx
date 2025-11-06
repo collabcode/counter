@@ -25,36 +25,36 @@ const Header: React.FC<HeaderProps> = ({
   theme,
   onThemeToggle,
 }) => {
-  const buttonClasses = "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors p-3 rounded-full bg-white/70 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-700 shadow-sm ring-1 ring-gray-200/70 dark:ring-gray-700/70";
+  const buttonClasses = "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 p-2.5 md:p-3 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700/90 shadow-sm hover:shadow-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 hover:ring-gray-300/50 dark:hover:ring-gray-600/50 active:scale-95";
 
   return (
-    <header className="fixed top-0 left-0 w-full p-4 bg-gradient-to-b from-white/80 to-white/40 dark:from-gray-900/80 dark:to-gray-900/40 backdrop-blur-lg z-30 border-b border-gray-200/70 dark:border-gray-800/70 transition-colors duration-300">
+    <header className="fixed top-0 left-0 w-full p-3 md:p-4 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl z-30 border-b border-gray-200/50 dark:border-gray-800/50 transition-all duration-300 shadow-sm">
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400">Counter</h1>
+        <h1 className="text-xl md:text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 dark:from-emerald-400 dark:via-green-400 dark:to-emerald-500">Counter</h1>
         
-        <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex items-center gap-1.5 md:gap-2">
           {sessionActive && (
-            <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="flex items-center gap-1.5 md:gap-2">
               <button
                 onClick={onPauseToggleClick}
                 className={buttonClasses}
                 aria-label={isPaused ? 'Play' : 'Pause'}
               >
-                {isPaused ? <PlayIcon className="w-6 h-6" /> : <PauseIcon className="w-6 h-6" />}
+                {isPaused ? <PlayIcon className="w-5 h-5 md:w-6 md:h-6" /> : <PauseIcon className="w-5 h-5 md:w-6 md:h-6" />}
               </button>
               <button
                 onClick={onRestartClick}
                 className={buttonClasses}
                 aria-label="Restart Session"
               >
-                <RestartIcon className="w-6 h-6" />
+                <RestartIcon className="w-5 h-5 md:w-6 md:h-6" />
               </button>
               <button
                 onClick={onHomeClick}
                 className={buttonClasses}
                 aria-label="New Session"
               >
-                <HomeIcon className="w-6 h-6" />
+                <HomeIcon className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
           )}
@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({
             className={buttonClasses}
             aria-label="Toggle theme"
           >
-            {theme === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
+            {theme === 'dark' ? <SunIcon className="w-5 h-5 md:w-6 md:h-6" /> : <MoonIcon className="w-5 h-5 md:w-6 md:h-6" />}
           </button>
         </div>
       </div>
