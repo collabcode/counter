@@ -25,12 +25,12 @@ const Header: React.FC<HeaderProps> = ({
   theme,
   onThemeToggle,
 }) => {
-  const buttonClasses = "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-3 rounded-full bg-gray-200/40 dark:bg-gray-800/40 hover:bg-gray-300/60 dark:hover:bg-gray-700/60";
+  const buttonClasses = "text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors p-3 rounded-full bg-white/70 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-700 shadow-sm ring-1 ring-gray-200/70 dark:ring-gray-700/70";
 
   return (
-    <header className="fixed top-0 left-0 w-full p-4 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm z-30 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+    <header className="fixed top-0 left-0 w-full p-4 bg-gradient-to-b from-white/80 to-white/40 dark:from-gray-900/80 dark:to-gray-900/40 backdrop-blur-lg z-30 border-b border-gray-200/70 dark:border-gray-800/70 transition-colors duration-300">
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-green-500 dark:text-green-400">Counter</h1>
+        <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400">Counter</h1>
         
         <div className="flex items-center space-x-2 md:space-x-4">
           {sessionActive && (

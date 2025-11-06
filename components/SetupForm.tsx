@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { type SessionConfig, CounterType, type SessionHistoryItem } from '../types';
 import PlayIcon from './icons/PlayIcon';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -8,6 +8,28 @@ interface SetupFormProps {
   onStart: (config: SessionConfig) => void;
   history: SessionHistoryItem[];
   onClearHistory: () => void;
+}
+
+type InputFieldProps = { label: string, name: string, value: string | number, min?: string, type?: string, placeholder?: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void };
+
+function InputField({ label, name, value, min = "1", type = "number", placeholder = "", onChange }: InputFieldProps) {
+  return (
+    <div className="flex flex-col">
+      <label htmlFor={name} className="mb-2 font-semibold text-gray-600 dark:text-gray-300">{label}</label>
+      <input
+        type={type}
+        name={name}
+        id={name}
+        value={value}
+        onChange={onChange}
+        min={min}
+        placeholder={placeholder}
+        autoComplete="off"
+        required={type === 'number'}
+        className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:outline-none transition text-gray-900 dark:text-white"
+      />
+    </div>
+  );
 }
 
 const SetupForm: React.FC<SetupFormProps> = ({ onStart, history, onClearHistory }) => {
@@ -22,39 +44,69 @@ const SetupForm: React.FC<SetupFormProps> = ({ onStart, history, onClearHistory 
   
   const [error, setError] = useState('');
 
+  // Local form state to make number inputs easy to edit (allow empty while typing)
+  const [form, setForm] = useState({
+    name: config.name,
+    steps: String(config.steps),
+    duration: String(config.duration),
+    sets: String(config.sets),
+    delay: String(config.delay),
+    counterType: config.counterType,
+  });
+
+  // Keep form in sync when stored config changes (e.g., load from history)
+  useEffect(() => {
+    setForm({
+      name: config.name,
+      steps: String(config.steps),
+      duration: String(config.duration),
+      sets: String(config.sets),
+      delay: String(config.delay),
+      counterType: config.counterType,
+    });
+  }, [config.name, config.steps, config.duration, config.sets, config.delay, config.counterType]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    setConfig(prev => {
-      const key = name as keyof SessionConfig;
-      const isNumericField = key === 'steps' || key === 'duration' || key === 'sets' || key === "delay";
-      const nextValue = isNumericField ? Number(value) : value;
-      return { ...prev, [key]: nextValue as any };
-    });
+    setForm(prev => ({
+      ...prev,
+      [name]: type === 'number' ? value : value,
+    }));
   };
   
   const handleCounterTypeChange = (type: CounterType) => {
-    setConfig(prev => ({ ...prev, counterType: type }));
+    setForm(prev => ({ ...prev, counterType: type }));
   };
 
   const handleLoadConfig = (item: SessionHistoryItem) => {
-    setConfig({
+    const loaded = {
       name: item.name,
       steps: item.steps,
       duration: item.duration,
       sets: item.sets,
       delay: item.delay,
       counterType: item.counterType,
+    };
+    setConfig(loaded);
+    setForm({
+      name: loaded.name,
+      steps: String(loaded.steps),
+      duration: String(loaded.duration),
+      sets: String(loaded.sets),
+      delay: String(loaded.delay),
+      counterType: loaded.counterType,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const parsedConfig = {
-      ...config,
-      steps: parseInt(String(config.steps)),
-      duration: parseInt(String(config.duration)),
-      sets: parseInt(String(config.sets)),
-      delay: parseInt(String(config.delay)),
+    const parsedConfig: SessionConfig = {
+      name: form.name.trim(),
+      steps: parseInt(form.steps, 10),
+      duration: parseInt(form.duration, 10),
+      sets: parseInt(form.sets, 10),
+      delay: parseInt(form.delay, 10),
+      counterType: form.counterType,
     };
     
     const { counterType: _, name: __, ...numericValues } = parsedConfig;
@@ -64,37 +116,23 @@ const SetupForm: React.FC<SetupFormProps> = ({ onStart, history, onClearHistory 
       return;
     }
     setError('');
+    setConfig(parsedConfig); // persist chosen config
     onStart(parsedConfig);
   };
 
-  const InputField = ({ label, name, value, min = "1", type = "number", placeholder = "" }: { label: string, name: string, value: string | number, min?: string, type?: string, placeholder?: string }) => (
-    <div className="flex flex-col">
-      <label htmlFor={name} className="mb-2 font-semibold text-gray-600 dark:text-gray-300">{label}</label>
-      <input
-        type={type}
-        name={name}
-        id={name}
-        value={value}
-        onChange={handleInputChange}
-        min={min}
-        placeholder={placeholder}
-        required={type === 'number'}
-        className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:outline-none transition text-gray-900 dark:text-white"
-      />
-    </div>
-  );
+  
 
   return (
     <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8">
       <div className="w-full md:w-1/2 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 self-start transition-colors duration-300">
         <h2 className="text-3xl font-bold text-center mb-6 text-green-600 dark:text-green-400">Session Setup</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <InputField label="Session Name (Optional)" name="name" value={config.name} type="text" placeholder="e.g., Morning Routine"/>
+          <InputField label="Session Name (Optional)" name="name" value={form.name} type="text" placeholder="e.g., Morning Routine" onChange={handleInputChange}/>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField label="Steps per Set" name="steps" value={config.steps} />
-            <InputField label="Duration per Step (s)" name="duration" value={config.duration} />
-            <InputField label="Number of Sets" name="sets" value={config.sets} />
-            <InputField label="Delay Between Sets (s)" name="delay" value={config.delay} />
+            <InputField label="Steps per Set" name="steps" value={form.steps} onChange={handleInputChange} />
+            <InputField label="Duration per Step (s)" name="duration" value={form.duration} onChange={handleInputChange} />
+            <InputField label="Number of Sets" name="sets" value={form.sets} onChange={handleInputChange} />
+            <InputField label="Delay Between Sets (s)" name="delay" value={form.delay} onChange={handleInputChange} />
           </div>
           
           <div>
@@ -103,14 +141,14 @@ const SetupForm: React.FC<SetupFormProps> = ({ onStart, history, onClearHistory 
               <button
                 type="button"
                 onClick={() => handleCounterTypeChange(CounterType.DOWN)}
-                className={`w-full py-2 rounded-md transition-colors ${config.counterType === CounterType.DOWN ? 'bg-green-500 text-white font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                className={`w-full py-2 rounded-md transition-colors ${form.counterType === CounterType.DOWN ? 'bg-green-500 text-white font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
               >
                 Count Down
               </button>
               <button
                 type="button"
                 onClick={() => handleCounterTypeChange(CounterType.UP)}
-                className={`w-full py-2 rounded-md transition-colors ${config.counterType === CounterType.UP ? 'bg-green-500 text-white font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                className={`w-full py-2 rounded-md transition-colors ${form.counterType === CounterType.UP ? 'bg-green-500 text-white font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
               >
                 Count Up
               </button>

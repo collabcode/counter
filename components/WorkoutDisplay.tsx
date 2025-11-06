@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { type SessionConfig, CounterType } from '../types';
 import { useSound } from '../hooks/useSound';
 import RestartIcon from './icons/RestartIcon';
@@ -22,12 +22,26 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
   const [restTime, setRestTime] = useState(delay);
   const [isFinished, setIsFinished] = useState(false);
   
+  // Refs to avoid stale state in interval callback
+  const currentSetRef = useRef(currentSet);
+  const currentStepRef = useRef(currentStep);
+  const isRestingRef = useRef(isResting);
+  const timeRef = useRef(time);
+  // When entering rest, capture which set we should resume on to avoid double-increment
+  const restTargetSetRef = useRef<number | null>(null);
+  
   const playBeep = useSound(523, 0.15); // C5 note for a clear beep
   const playFinishBeep = useSound(784, 0.5); // G5 note for finish
 
   useEffect(() => {
     onProgress({ set: currentSet, step: currentStep, isResting });
   }, [currentSet, currentStep, isResting, onProgress]);
+
+  // keep refs in sync with state
+  useEffect(() => { currentSetRef.current = currentSet; }, [currentSet]);
+  useEffect(() => { currentStepRef.current = currentStep; }, [currentStep]);
+  useEffect(() => { isRestingRef.current = isResting; }, [isResting]);
+  useEffect(() => { timeRef.current = time; }, [time]);
 
   const handleRestart = () => {
     setCurrentSet(1);
@@ -47,12 +61,19 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
     if (isFinished || isPaused) return;
 
     const interval = setInterval(() => {
-      if (isResting) {
+      const resting = isRestingRef.current;
+      const cs = currentSetRef.current;
+      const cstep = currentStepRef.current;
+      const t = timeRef.current;
+
+      if (resting) {
         setRestTime(prev => {
           if (prev <= 1) {
             playBeep();
             setIsResting(false);
-            setCurrentSet(cs => cs + 1);
+            const target = restTargetSetRef.current ?? (currentSetRef.current + 1);
+            setCurrentSet(() => Math.min(target, sets));
+            restTargetSetRef.current = null;
             setCurrentStep(1);
             setTime(counterType === CounterType.DOWN ? duration : 0);
             return delay;
@@ -60,29 +81,30 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
           return prev - 1;
         });
       } else {
-        const isStepComplete = counterType === CounterType.DOWN ? time <= 1 : time >= duration -1;
+        const isStepComplete = counterType === CounterType.DOWN ? t <= 1 : t >= duration - 1;
 
         if (isStepComplete) {
           playBeep();
-          if (currentSet === sets && currentStep === steps) {
+          if (cs === sets && cstep === steps) {
             playFinishBeep();
             setIsFinished(true);
             onComplete(config);
           } else if (currentStep === steps) {
+            restTargetSetRef.current = cs + 1;
             setIsResting(true);
           } else {
             setCurrentStep(cs => cs + 1);
             setTime(counterType === CounterType.DOWN ? duration : 0);
           }
         } else {
-          setTime(t => counterType === CounterType.DOWN ? t - 1 : t + 1);
+          setTime(v => counterType === CounterType.DOWN ? v - 1 : v + 1);
         }
       }
     }, 1000);
 
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time, isResting, isFinished, isPaused, config]);
+  }, [time, isResting, isFinished, isPaused, config, currentSet, currentStep]);
 
   const getCellState = (setIndex: number, stepIndex: number): 'completed' | 'active' | 'upcoming' => {
     if (setIndex < currentSet || (setIndex === currentSet && stepIndex < currentStep)) {
@@ -95,9 +117,9 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
   };
 
   const cellClasses = {
-    completed: 'bg-green-500 scale-100',
-    active: 'bg-yellow-500 scale-110 animate-pulse',
-    upcoming: 'bg-gray-300 dark:bg-gray-700 scale-100',
+    completed: 'bg-green-500/90 shadow-inner shadow-green-900/10 scale-100',
+    active: 'bg-yellow-500/90 shadow-lg shadow-yellow-500/30 scale-110 animate-pulse',
+    upcoming: 'bg-gray-300/80 dark:bg-gray-700/80 scale-100',
   };
 
   return (
