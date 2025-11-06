@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Counter",
+  "description": "A responsive web app to configure and visually track your session sets and steps with a timer-based visualization.",
+  "requestFramePermissions": []
+}
