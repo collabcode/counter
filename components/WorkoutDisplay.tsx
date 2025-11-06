@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { type SessionConfig, CounterType } from '../types';
 import { useSound } from '../hooks/useSound';
 import RestartIcon from './icons/RestartIcon';
+import { ThemeName } from '../hooks/useTheme';
+import { getThemeTextGradient, getThemeButtonClasses, getThemeGradient } from '../utils/themeUtils';
 
 interface WorkoutDisplayProps {
   config: SessionConfig;
@@ -10,9 +12,10 @@ interface WorkoutDisplayProps {
   isPaused: boolean;
   restartSignal: number;
   onProgress: (progress: { set: number, step: number, isResting: boolean }) => void;
+  theme?: ThemeName;
 }
 
-const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onComplete, isPaused, restartSignal, onProgress }) => {
+const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onComplete, isPaused, restartSignal, onProgress, theme = 'emerald' as ThemeName }) => {
   const { steps, duration, sets, delay, counterType } = config;
   
   const [currentSet, setCurrentSet] = useState(1);
@@ -117,7 +120,7 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
   };
 
   const cellClasses = {
-    completed: 'bg-gradient-to-br from-emerald-500 to-green-500 shadow-lg shadow-emerald-500/20 scale-100',
+    completed: `bg-gradient-to-br ${getThemeGradient(theme, 'from')} ${getThemeGradient(theme, 'to')} shadow-lg scale-100`,
     active: 'bg-gradient-to-br from-amber-400 to-yellow-500 shadow-2xl shadow-amber-500/40 scale-105 ring-2 ring-amber-300/50 dark:ring-amber-400/30 animate-pulse',
     upcoming: 'bg-gray-200/60 dark:bg-gray-700/60 scale-100 border border-gray-300/30 dark:border-gray-600/30',
   };
@@ -155,11 +158,11 @@ const WorkoutDisplay: React.FC<WorkoutDisplayProps> = ({ config, onGoHome, onCom
         <div className="text-center bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl p-6 md:p-10 lg:p-12 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-[90%] md:max-w-md" role="status" aria-live="polite">
           {isFinished ? (
             <>
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-green-500 dark:from-emerald-400 dark:to-green-400 mb-2">COMPLETE!</h2>
-              <p className="text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mt-2">{config.name || 'Great work!'}</p>
+              <h2 className={`text-5xl md:text-7xl lg:text-8xl font-black bg-clip-text text-transparent ${getThemeTextGradient(theme)} mb-2`}>COMPLETE!</h2>
+              <p className="text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mt-2">{config.name || 'Complete!'}</p>
               <button 
                 onClick={() => onGoHome(true)} 
-                className="mt-6 md:mt-8 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl text-base md:text-lg flex items-center justify-center gap-2 pointer-events-auto transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 active:scale-95 mx-auto"
+                className={`mt-6 md:mt-8 ${getThemeButtonClasses(theme)} text-white font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl text-base md:text-lg flex items-center justify-center gap-2 pointer-events-auto transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 mx-auto`}
               >
                 <RestartIcon className="w-5 h-5 md:w-6 md:h-6" />
                 New Session

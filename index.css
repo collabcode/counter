@@ -1,6 +1,40 @@
 /* Minimal base styles; Tailwind via CDN handles utilities */
 :root {
 	color-scheme: light dark;
+	--theme-primary: rgb(16, 185, 129); /* emerald-500 */
+	--theme-primary-dark: rgb(5, 150, 105); /* emerald-600 */
+	--theme-primary-light: rgb(52, 211, 153); /* emerald-400 */
+}
+
+/* Theme-specific color overrides */
+.theme-blue {
+	--theme-primary: rgb(59, 130, 246); /* blue-500 */
+	--theme-primary-dark: rgb(37, 99, 235); /* blue-600 */
+	--theme-primary-light: rgb(96, 165, 250); /* blue-400 */
+}
+
+.theme-purple {
+	--theme-primary: rgb(168, 85, 247); /* purple-500 */
+	--theme-primary-dark: rgb(147, 51, 234); /* purple-600 */
+	--theme-primary-light: rgb(192, 132, 252); /* purple-400 */
+}
+
+.theme-orange {
+	--theme-primary: rgb(249, 115, 22); /* orange-500 */
+	--theme-primary-dark: rgb(234, 88, 12); /* orange-600 */
+	--theme-primary-light: rgb(251, 146, 60); /* orange-400 */
+}
+
+.theme-rose {
+	--theme-primary: rgb(244, 63, 94); /* rose-500 */
+	--theme-primary-dark: rgb(225, 29, 72); /* rose-600 */
+	--theme-primary-light: rgb(251, 113, 133); /* rose-400 */
+}
+
+.theme-emerald {
+	--theme-primary: rgb(16, 185, 129); /* emerald-500 */
+	--theme-primary-dark: rgb(5, 150, 105); /* emerald-600 */
+	--theme-primary-light: rgb(52, 211, 153); /* emerald-400 */
 }
 
 html,
