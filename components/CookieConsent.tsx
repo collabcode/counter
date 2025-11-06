@@ -15,12 +15,14 @@ const CookieConsent: React.FC<CookieConsentProps> = ({ onNavigateToCookiePolicy 
   };
 
   const handleDecline = () => {
-    // Clear all local storage except consent preference
+    // Clear all local storage except consent preference and theme preference
     const theme = localStorage.getItem('theme');
     localStorage.clear();
     if (theme) {
       localStorage.setItem('theme', theme);
     }
+    // Explicitly set consent to false if declined
+    localStorage.setItem('cookie-consent', 'false');
     setConsentGiven(false);
     setShowBanner(false);
   };

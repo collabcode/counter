@@ -27,12 +27,13 @@ type InputFieldProps = {
   value: string | number, 
   min?: string, 
   max?: string,
+  maxLength?: string,
   type?: string, 
   placeholder?: string, 
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void 
 };
 
-function InputField({ label, name, value, min = "1", max, type = "number", placeholder = "", onChange, title }: InputFieldProps & { title?: string }) {
+function InputField({ label, name, value, min = "1", max, maxLength, type = "number", placeholder = "", onChange, title }: InputFieldProps & { title?: string }) {
   return (
     <div className="flex flex-col w-full h-full justify-between">
       <label htmlFor={name} className="mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 min-h-[2.5rem] flex items-start leading-tight">
@@ -54,6 +55,7 @@ function InputField({ label, name, value, min = "1", max, type = "number", place
           onChange={onChange}
           min={min}
           max={max}
+          maxLength={maxLength ? parseInt(maxLength, 10) : undefined}
           placeholder={placeholder}
           autoComplete="off"
           required={type === 'number'}
@@ -256,7 +258,7 @@ const SetupForm: React.FC<SetupFormProps> = ({ onStart, history, onClearHistory,
       <div className="w-full lg:w-1/2 lg:flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 hover:shadow-2xl">
         <h2 className={`text-2xl md:text-3xl font-bold text-center mb-6 bg-clip-text text-transparent ${getThemeTextGradient(theme)}`}>Setup</h2>
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
-          <InputField label="Name (Optional)" name="name" value={form.name} type="text" placeholder="e.g., Morning Session" onChange={handleInputChange}/>
+          <InputField label="Name (Optional)" name="name" value={form.name} type="text" placeholder="e.g., Morning Session" onChange={handleInputChange} maxLength="100"/>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:items-stretch">
             <InputField 
               label={`Steps per Set (${FIELD_LIMITS.steps.min}-${FIELD_LIMITS.steps.max})`} 
@@ -325,7 +327,7 @@ const SetupForm: React.FC<SetupFormProps> = ({ onStart, history, onClearHistory,
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3" role="alert" aria-live="polite" id="form-error">
               <p className="text-red-600 dark:text-red-400 text-sm text-center font-medium">{error}</p>
             </div>
           )}
